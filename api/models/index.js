@@ -3,18 +3,27 @@ import { Sequelize } from 'sequelize';
 import User from './User.js';
 import pg from 'pg';
 
-
-
-
 const sequelize = new Sequelize(
-    dbConfig.database,
-    dbConfig.user,
-    dbConfig.password,
+  dbConfig.database,
+  dbConfig.user,
+  dbConfig.password,
   {
     host: dbConfig.host,
     dialect: dbConfig.dialect,
     port: dbConfig.port,
-    dialecctModule: pg,
+    dialectModule: pg, // Corrigido (estava 'dialecctModule')
+
+    logging: false,
+
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+
+
     pool: {
       max: dbConfig.pool.max,
       min: dbConfig.pool.min,

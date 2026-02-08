@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from '../models/User.js';
-import userService from '../services/user.service.js';
+
 
 const registerUser = async ({ username, email, password }) => {
     // Verifica se já existe um usuário com o email informado
