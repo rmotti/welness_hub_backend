@@ -3,6 +3,7 @@ import db from './models/index.js';
 import path from 'path';
 import { fileURLToPath } from 'url'; // <--- 1. IMPORTAR ISTO
 import userRoute from './routes/user.route.js';
+import exerciseRoute from './routes/exercise.route.js';
 import exampleRoute from './routes/example.route.js';
 
 import swaggerUi from 'swagger-ui-express';
