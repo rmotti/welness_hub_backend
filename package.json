@@ -1,0 +1,26 @@
+{
+  "name": "express-backend-example",
+  "version": "0.0.1",
+  "description": "",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "start-app": "nodemon api/index.js",
+    "start-database": "docker compose up -d",
+    "stop-database": "docker compose down",
+    "generate-secret-key": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+  },
+  "author": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.15.6",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
