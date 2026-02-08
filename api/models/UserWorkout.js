@@ -9,19 +9,17 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.DATEONLY,
       defaultValue: Sequelize.NOW
     },
+    data_fim: { type: Sequelize.DATEONLY },
     status_treino: {
       type: Sequelize.ENUM('Ativo', 'Finalizado'),
       defaultValue: 'Ativo'
     },
-    usuario_id: {
-      type: Sequelize.INTEGER
-    },
-    treino_id: {
-      type: Sequelize.INTEGER
-    }
+    usuario_id: { type: Sequelize.INTEGER },
+    treino_id: { type: Sequelize.INTEGER }
   }, {
     tableName: 'TREINO_ALUNO',
-    timestamps: false
+    timestamps: true,
+    underscored: true
   });
 
   return UserWorkout;

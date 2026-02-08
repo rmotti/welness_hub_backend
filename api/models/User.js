@@ -1,5 +1,5 @@
 export default (sequelize, Sequelize) => {
-  const Usuario = sequelize.define("usuario", {
+  const User = sequelize.define("users", {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -14,31 +14,37 @@ export default (sequelize, Sequelize) => {
       allowNull: false,
       unique: true
     },
-    senha: {
+    password: { // No JS chamamos de 'password'
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
+      field: 'senha' // No Banco a coluna chama 'senha'
     },
-    telefone: {
-      type: Sequelize.STRING
-    },
-    idade: {
-      type: Sequelize.INTEGER
+    role: {
+      type: Sequelize.ENUM('admin', 'aluno'),
+      defaultValue: 'aluno'
     },
     status: {
       type: Sequelize.ENUM('Ativo', 'Inativo'),
       defaultValue: 'Ativo'
     },
-    objetivo: {
-      type: Sequelize.ENUM('Ganho de Massa', 'Perda de Peso', 'Manutenção')
-    },
-    data_criacao: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
+    objetivo: { type: Sequelize.STRING },
+    telefone: { type: Sequelize.STRING },
+    idade: { type: Sequelize.INTEGER },
+    
+    // O PULO DO GATO (Hierarquia)
+    personal_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'USUARIO', // Nome exato da tabela no banco
+        key: 'id'
+      }
     }
   }, {
-    tableName: 'USUARIO', // Força o nome exato da tabela no banco
-    timestamps: false     // Desativa o createdAt/updatedAt padrão do Sequelize
+    tableName: 'USUARIO', // Nome exato da tabela
+    timestamps: true,     // O script SQL tem created_at/updated_at
+    underscored: true     // Converte camelCase para snake_case (createdAt -> created_at)
   });
 
-  return Usuario;
+  return User;
 };
