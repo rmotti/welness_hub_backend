@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'; // Ou 'bcrypt' dependendo do que instalou
+import bcrypt from 'bcryptjs'; 
 import jwt from 'jsonwebtoken';
 import db from '../models/index.js';
 
