@@ -1,26 +1,44 @@
-
 export default (sequelize, Sequelize) => {
-  const User = sequelize.define("user", {
+  const Usuario = sequelize.define("usuario", {
     id: {
       type: Sequelize.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
-    username: {
+    nome: {
       type: Sequelize.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false
     },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
       unique: true
     },
-    password: {
+    senha: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    telefone: {
+      type: Sequelize.STRING
+    },
+    idade: {
+      type: Sequelize.INTEGER
+    },
+    status: {
+      type: Sequelize.ENUM('Ativo', 'Inativo'),
+      defaultValue: 'Ativo'
+    },
+    objetivo: {
+      type: Sequelize.ENUM('Ganho de Massa', 'Perda de Peso', 'Manutenção')
+    },
+    data_criacao: {
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.NOW
     }
+  }, {
+    tableName: 'USUARIO', // Força o nome exato da tabela no banco
+    timestamps: false     // Desativa o createdAt/updatedAt padrão do Sequelize
   });
 
-  return User;
-}
+  return Usuario;
+};
