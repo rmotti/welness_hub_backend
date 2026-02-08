@@ -5,15 +5,9 @@ export default (sequelize, Sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    peso: { // Mantive o nome da coluna em PT pois está assim no banco
-      type: Sequelize.DECIMAL(5, 2)
-    },
-    altura: {
-      type: Sequelize.DECIMAL(3, 2)
-    },
-    bf_percentual: {
-      type: Sequelize.DECIMAL(5, 2)
-    },
+    peso: { type: Sequelize.DECIMAL(5, 2) },
+    altura: { type: Sequelize.DECIMAL(3, 2) },
+    bf_percentual: { type: Sequelize.DECIMAL(5, 2) },
     data_medicao: {
       type: Sequelize.DATEONLY,
       defaultValue: Sequelize.NOW
@@ -23,8 +17,9 @@ export default (sequelize, Sequelize) => {
       allowNull: false
     }
   }, {
-    tableName: 'MEDIDAS_ALUNOS', // Mapeia para a tabela existente
-    timestamps: false
+    tableName: 'MEDIDAS',
+    timestamps: true,
+    underscored: true
   });
 
   return Measurements;

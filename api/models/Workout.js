@@ -9,12 +9,12 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false
     },
-    objetivo_treino: {
-      type: Sequelize.STRING
-    }
+    objetivo_treino: { type: Sequelize.STRING },
+    descricao: { type: Sequelize.TEXT }
   }, {
     tableName: 'TREINO',
-    timestamps: false
+    timestamps: true,
+    underscored: true
   });
 
   return Workout;
