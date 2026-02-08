@@ -1,25 +1,28 @@
 export default (sequelize, Sequelize) => {
-  const Workout = sequelize.define("workout", {
+  const Exercise = sequelize.define("exercise", {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    nome_treino: {
+    nome: {
       type: Sequelize.STRING,
       allowNull: false
     },
-    objetivo_treino: {
+    grupo_muscular: {
+      type: Sequelize.STRING
+    },
+    link_video: {
       type: Sequelize.STRING
     },
     descricao: {
       type: Sequelize.TEXT
     }
   }, {
-    tableName: 'TREINO',
-    timestamps: false, // Sem created_at/updated_at no SQL
+    tableName: 'EXERCICIO',
+    timestamps: false,
     underscored: true
   });
 
-  return Workout;
+  return Exercise;
 };

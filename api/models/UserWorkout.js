@@ -5,20 +5,36 @@ export default (sequelize, Sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    usuario_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'USUARIO',
+        key: 'id'
+      }
+    },
+    treino_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'TREINO',
+        key: 'id'
+      }
+    },
     data_inicio: {
       type: Sequelize.DATEONLY,
       defaultValue: Sequelize.NOW
     },
-    data_fim: { type: Sequelize.DATEONLY },
+    data_fim: {
+      type: Sequelize.DATEONLY
+    },
     status_treino: {
       type: Sequelize.ENUM('Ativo', 'Finalizado'),
       defaultValue: 'Ativo'
-    },
-    usuario_id: { type: Sequelize.INTEGER },
-    treino_id: { type: Sequelize.INTEGER }
+    }
   }, {
     tableName: 'TREINO_ALUNO',
-    timestamps: true,
+    timestamps: false,
     underscored: true
   });
 

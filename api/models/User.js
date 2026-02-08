@@ -14,14 +14,14 @@ export default (sequelize, Sequelize) => {
       allowNull: false,
       unique: true
     },
-    password: { // No JS chamamos de 'password'
+    password: {
       type: Sequelize.STRING,
-      allowNull: false,
-      field: 'senha' // No Banco a coluna chama 'senha'
+      allowNull: false
+      // Removi 'field: senha' pois no SQL novo a coluna chama 'password' mesmo
     },
     role: {
-      type: Sequelize.ENUM('admin', 'aluno'),
-      defaultValue: 'aluno'
+      type: Sequelize.ENUM('ADMIN', 'ALUNO'), // Maiúsculo conforme SQL
+      defaultValue: 'ALUNO'
     },
     status: {
       type: Sequelize.ENUM('Ativo', 'Inativo'),
@@ -29,21 +29,20 @@ export default (sequelize, Sequelize) => {
     },
     objetivo: { type: Sequelize.STRING },
     telefone: { type: Sequelize.STRING },
-    idade: { type: Sequelize.INTEGER },
     
-    // O PULO DO GATO (Hierarquia)
+    // Auto-relacionamento (Personal)
     personal_id: {
       type: Sequelize.INTEGER,
       allowNull: true,
       references: {
-        model: 'USUARIO', // Nome exato da tabela no banco
+        model: 'USUARIO',
         key: 'id'
       }
     }
   }, {
-    tableName: 'USUARIO', // Nome exato da tabela
-    timestamps: true,     // O script SQL tem created_at/updated_at
-    underscored: true     // Converte camelCase para snake_case (createdAt -> created_at)
+    tableName: 'USUARIO',
+    timestamps: false, // O SQL não criou created_at/updated_at
+    underscored: true
   });
 
   return User;
