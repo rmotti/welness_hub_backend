@@ -69,6 +69,7 @@ db.sequelize.sync()
     });
 
 app.use("/users", userRoute);
+app.use("/exercises", exerciseRoute);
 app.use("/secureExampleRoute", exampleRoute);
 
 app.get('/', (req, res) => {

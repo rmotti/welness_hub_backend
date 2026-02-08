@@ -1,4 +1,4 @@
-import exerciseService from '../service/exercise.service.js';
+import exerciseService from '../services/exercise.service.js';
 
 const createExercise = async (req, res) => {
     const { nome, descricao, grupo_muscular } = req.body;
