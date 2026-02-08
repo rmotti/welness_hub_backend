@@ -93,6 +93,34 @@ const updateUser = async (req, res) => {
     }
 };
 
+const updateMe = async (req, res) => {
+    try {
+        const userId = req.userId; // Vem do verifyToken
+        const { nome, email, password, telefone, objetivo } = req.body;
+
+        // FILTRO DE SEGURANÇA:
+        // Montamos um objeto apenas com o que é PERMITIDO alterar no próprio perfil.
+        // Isso impede que um aluno vire ADMIN enviando { role: 'ADMIN' }.
+        const dataToUpdate = {};
+        
+        if (nome) dataToUpdate.nome = nome;
+        if (email) dataToUpdate.email = email;
+        if (password) dataToUpdate.password = password; // O Service vai fazer o hash
+        if (telefone) dataToUpdate.telefone = telefone;
+        if (objetivo) dataToUpdate.objetivo = objetivo;
+
+        // Chama o service reutilizando a função de update existente
+        const updatedUser = await userService.updateUser(userId, dataToUpdate);
+
+        return res.status(200).json({ 
+            message: 'Perfil atualizado com sucesso!', 
+            user: updatedUser 
+        });
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message });
+    }
+};
+
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
@@ -121,6 +149,7 @@ export default {
     createStudent,
     getAllStudents,
     updateUser,
+    updateMe,
     deleteUser,
     getDashboard
 };

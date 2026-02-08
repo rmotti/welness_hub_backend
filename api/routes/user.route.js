@@ -12,6 +12,7 @@ router.post('/login', userController.login);       // Principal porta de entrada
 
 // 1. Identificação ("Quem sou eu?")
 router.get('/me', verifyToken, userController.getMe); 
+router.put('/me', verifyToken, userController.updateMe);
 
 // 2. Dashboard (KPIs para a Home)
 router.get('/dashboard/stats', verifyToken, userController.getDashboard);
