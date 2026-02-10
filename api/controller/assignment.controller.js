@@ -1,4 +1,4 @@
-import assignmentService from "../services/assignment.service";
+import assignmentService from "../services/assignment.service.js";
 
 const assignWorkout = async (req, res) => {
     try {
