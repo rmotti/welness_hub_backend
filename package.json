@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start-app": "nodemon api/index.js",
+    "build": "echo 'Build script executado com sucesso'",
     "start-database": "docker compose up -d",
     "stop-database": "docker compose down",
     "generate-secret-key": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""

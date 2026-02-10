@@ -1,4 +1,4 @@
-import WorkoutService from '../services/workout.service.js';
+import workoutService from '../services/workout.service.js';
 
 // --- Controllers de Treino (Cabeçalho) ---
 
@@ -11,7 +11,7 @@ const create = async (req, res) => {
             return res.status(400).send({ message: "O nome do treino é obrigatório." });
         }
 
-        const workout = await WorkoutService.createWorkout({
+        const workout = await workoutService.createWorkout({
             nome,
             descricao,
             personal_id
@@ -28,7 +28,7 @@ const getAll = async (req, res) => {
         const personal_id = req.userId; // Garante que só busca treinos deste personal
         const filters = req.query; // Pega filtros da URL (ex: ?nome=Hipertrofia)
 
-        const workouts = await WorkoutService.getAllWorkouts(personal_id, filters);
+        const workouts = await workoutService.getAllWorkouts(personal_id, filters);
         
         res.status(200).send(workouts);
     } catch (error) {
@@ -43,7 +43,7 @@ const update = async (req, res) => {
         // Opcional: Validar se o treino pertence ao personal antes de editar
         // (Isso geralmente é feito no service ou aqui verificando o dono)
         
-        const updatedWorkout = await WorkoutService.updateWorkout(id, req.body);
+        const updatedWorkout = await workoutService.updateWorkout(id, req.body);
         res.status(200).send(updatedWorkout);
     } catch (error) {
         if (error.status) {
@@ -60,7 +60,7 @@ const getExercises = async (req, res) => {
     try {
         const workoutId = req.params.workoutId;
         
-        const exercises = await WorkoutService.getWorkoutExercises(workoutId);
+        const exercises = await workoutService.getWorkoutExercises(workoutId);
         
         res.status(200).send(exercises);
     } catch (error) {
@@ -88,7 +88,7 @@ const addExercise = async (req, res) => {
             return res.status(400).send({ message: "ID do exercício é obrigatório." });
         }
 
-        const newExerciseItem = await WorkoutService.addExerciseToWorkout(workoutId, {
+        const newExerciseItem = await workoutService.addExerciseToWorkout(workoutId, {
             exercicio_id,
             series,
             repeticoes,
@@ -113,7 +113,7 @@ const updateExerciseItem = async (req, res) => {
         const exerciseId = req.params.exerciseId;
         const data = req.body;
 
-        const updatedItem = await WorkoutService.updateWorkoutExercise(workoutId, exerciseId, data);
+        const updatedItem = await workoutService.updateWorkoutExercise(workoutId, exerciseId, data);
         
         res.status(200).send(updatedItem);
     } catch (error) {
@@ -130,7 +130,7 @@ const removeExercise = async (req, res) => {
         const workoutId = req.params.workoutId;
         const exerciseId = req.params.exerciseId;
 
-        const result = await WorkoutService.removeExerciseFromWorkout(workoutId, exerciseId);
+        const result = await workoutService.removeExerciseFromWorkout(workoutId, exerciseId);
         
         res.status(200).send(result);
     } catch (error) {
