@@ -1,5 +1,5 @@
-import controller from "../controllers/workout.controller.js";
-import authJwt from "../middleware/authJwt.js"; // Exemplo de middleware
+import controller from "../controller/workout.controller.js";
+import verifyToken from '../middleware/jwt.token.middleware.js'; // Importando o middleware
 
 export default function(app) {
     app.use(function(req, res, next) {
@@ -8,13 +8,13 @@ export default function(app) {
     });
 
     // Rotas de Treino (Cabeçalho)
-    app.post("/api/workouts", [authJwt.verifyToken], controller.create);
-    app.get("/api/workouts", [authJwt.verifyToken], controller.getAll);
-    app.put("/api/workouts/:id", [authJwt.verifyToken], controller.update);
+    app.post("/api/workouts", [verifyToken], controller.create);
+    app.get("/api/workouts", [verifyToken], controller.getAll);
+    app.put("/api/workouts/:id", [verifyToken], controller.update);
 
     // Rotas de Exercícios dentro do Treino
-    app.get("/api/workouts/:workoutId/exercises", [authJwt.verifyToken], controller.getExercises);
-    app.post("/api/workouts/:workoutId/exercises", [authJwt.verifyToken], controller.addExercise);
-    app.put("/api/workouts/:workoutId/exercises/:exerciseId", [authJwt.verifyToken], controller.updateExerciseItem);
-    app.delete("/api/workouts/:workoutId/exercises/:exerciseId", [authJwt.verifyToken], controller.removeExercise);
+    app.get("/api/workouts/:workoutId/exercises", [verifyToken], controller.getExercises);
+    app.post("/api/workouts/:workoutId/exercises", [verifyToken], controller.addExercise);
+    app.put("/api/workouts/:workoutId/exercises/:exerciseId", [verifyToken], controller.updateExerciseItem);
+    app.delete("/api/workouts/:workoutId/exercises/:exerciseId", [verifyToken], controller.removeExercise);
 };
