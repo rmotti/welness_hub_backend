@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url'; // <--- 1. IMPORTAR ISTO
 import userRoute from './routes/user.route.js';
 import exerciseRoute from './routes/exercise.route.js';
+import workoutRoute from './routes/workout.route.js';
 import exampleRoute from './routes/example.route.js';
 
 import swaggerUi from 'swagger-ui-express';
@@ -70,6 +71,7 @@ db.sequelize.sync()
 
 app.use("/users", userRoute);
 app.use("/exercises", exerciseRoute);
+app.use("/workouts", workoutRoute);
 app.use("/secureExampleRoute", exampleRoute);
 
 app.get('/', (req, res) => {
