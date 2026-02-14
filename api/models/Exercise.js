@@ -19,7 +19,7 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.TEXT
     }
   }, {
-    tableName: 'EXERCICIO',
+    tableName: 'exercicio',
     timestamps: false,
     underscored: true
   });

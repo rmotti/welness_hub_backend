@@ -35,12 +35,12 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: true,
       references: {
-        model: 'USUARIO',
+        model: 'usuario',
         key: 'id'
       }
     }
   }, {
-    tableName: 'USUARIO',
+    tableName: 'usuario',
     timestamps: false, // O SQL não criou created_at/updated_at
     underscored: true
   });
