@@ -2,48 +2,34 @@ import assignmentService from "../services/assignment.service.js";
 
 const assignWorkout = async (req, res) => {
     try {
-        const userId = req.body.userId;
-        const workoutId = req.body.workoutId;
+        const { aluno_id, treino_id, data_inicio, data_fim } = req.body;
 
-        const assignment = await assignmentService.assignWorkoutToUser(userId, workoutId);
-        res.status(201).json(assignment);
+        if (!aluno_id || !treino_id) {
+            return res.status(400).json({ message: 'aluno_id e treino_id são obrigatórios.' });
+        }
+
+        const assignment = await assignmentService.assignWorkoutToUser(aluno_id, treino_id, { data_inicio, data_fim });
+        res.status(201).json({ message: 'Treino atribuído com sucesso!', assignment });
     } catch (error) {
         res.status(error.status || 500).json({ message: error.message });
     }
 };
 
-const addExerciseToWorkout = async (req, res) => {
+const getStudentWorkouts = async (req, res) => {
     try {
-        const workoutId = req.params.workoutId;
-        const data = req.body;
-
-        const newExerciseItem = await assignmentService.addExerciseToWorkout(workoutId, data);
-        res.status(201).json(newExerciseItem);
+        const { id } = req.params;
+        const workouts = await assignmentService.getStudentWorkouts(id);
+        res.status(200).json(workouts);
     } catch (error) {
         res.status(error.status || 500).json({ message: error.message });
     }
 };
 
-const updateWorkoutExercise = async (req, res) => {
+const finishAssignment = async (req, res) => {
     try {
-        const workoutId = req.params.workoutId;
-        const exerciseId = req.params.exerciseId;
-        const data = req.body;
-
-        const updatedItem = await assignmentService.updateWorkoutExercise(workoutId, exerciseId, data);
-        res.status(200).json(updatedItem);
-    } catch (error) {
-        res.status(error.status || 500).json({ message: error.message });
-    }
-};
-
-const removeExerciseFromWorkout = async (req, res) => {
-    try {
-        const workoutId = req.params.workoutId;
-        const exerciseId = req.params.exerciseId;
-
-        const result = await assignmentService.removeExerciseFromWorkout(workoutId, exerciseId);
-        res.status(200).json(result);
+        const { id } = req.params;
+        const assignment = await assignmentService.finishAssignment(id);
+        res.status(200).json({ message: 'Ficha finalizada com sucesso!', assignment });
     } catch (error) {
         res.status(error.status || 500).json({ message: error.message });
     }
@@ -51,8 +37,6 @@ const removeExerciseFromWorkout = async (req, res) => {
 
 export default {
     assignWorkout,
-    addExerciseToWorkout,
-    updateWorkoutExercise,
-    removeExerciseFromWorkout
+    getStudentWorkouts,
+    finishAssignment
 };
-
