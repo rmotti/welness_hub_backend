@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const useSSL = process.env.DB_SSL === 'true';
+
 const dbConfig = {
   host: process.env.POSTGRES_HOST,
   user: process.env.POSTGRES_USER,
@@ -8,22 +10,17 @@ const dbConfig = {
   database: process.env.POSTGRES_DATABASE,
   port: process.env.POSTGRES_PORT,
   dialect: 'postgres',
-  
-  // --- O SEGREDO ESTÁ NESTE BLOCO ---
-  dialectOptions: {
-    ssl: {
-      require: true,            // Obriga o uso de SSL
-      rejectUnauthorized: false // Aceita o certificado do Neon sem burocracia
-    }
-  },
-  // ----------------------------------
+
+  dialectOptions: useSSL
+    ? { ssl: { require: true, rejectUnauthorized: false } }
+    : {},
 
   pool: {
     max: 2,
     min: 0,
-    acquire: 3000,
+    acquire: 30000,
     idle: 0,
-    evict: 8000, 
+    evict: 8000,
   }
 };
 

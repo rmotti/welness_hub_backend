@@ -22,12 +22,12 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {         // Boa prática: explicitar a FK aqui também
-        model: 'USUARIO',
+        model: 'usuario',
         key: 'id'
       }
     }
   }, {
-    tableName: 'MEDIDAS',
+    tableName: 'medidas',
     timestamps: false, // IMPORTANTE: O SQL não tem created_at/updated_at
     underscored: true
   });

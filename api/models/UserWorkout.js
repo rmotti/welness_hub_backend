@@ -9,7 +9,7 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: 'USUARIO',
+        model: 'usuario',
         key: 'id'
       }
     },
@@ -17,7 +17,7 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: 'TREINO',
+        model: 'treino',
         key: 'id'
       }
     },
@@ -33,7 +33,7 @@ export default (sequelize, Sequelize) => {
       defaultValue: 'Ativo'
     }
   }, {
-    tableName: 'TREINO_ALUNO',
+    tableName: 'treino_aluno',
     timestamps: false,
     underscored: true
   });

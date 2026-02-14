@@ -16,7 +16,7 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.TEXT
     }
   }, {
-    tableName: 'TREINO',
+    tableName: 'treino',
     timestamps: false, // Sem created_at/updated_at no SQL
     underscored: true
   });
