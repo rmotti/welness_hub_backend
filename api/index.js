@@ -1,23 +1,22 @@
 import express from 'express';
+import cors from 'cors';
 import db from './models/index.js';
 import path from 'path';
-import { fileURLToPath } from 'url'; // <--- 1. IMPORTAR ISTO
-import userRoute from './routes/user.route.js';
-import exerciseRoute from './routes/exercise.route.js';
-import workoutRoute from './routes/workout.route.js';
-import assignmentRoute from './routes/assignment.route.js';
-import exampleRoute from './routes/example.route.js';
+import { fileURLToPath } from 'url';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
-// 2. CONFIGURAR __dirname (Necessário em ES Modules)
+import routes from './routes/index.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
+// --- SWAGGER CONFIG ---
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -31,7 +30,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: 'http://localhost:3001',
         description: 'Servidor Local',
       },
     ],
@@ -50,18 +49,13 @@ const swaggerOptions = {
       },
     ],
   },
-  // 3. CORREÇÃO DO CAMINHO: Usar __dirname garante que ele olhe a pasta ao lado do index.js
-  apis: [path.join(__dirname, 'routes', '*.js')],
+  apis: [path.join(__dirname, 'routes', 'index.js')],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-
-// Debug para confirmar se funcionou
-console.log("DEBUG SWAGGER:", JSON.stringify(swaggerDocs.paths, null, 2));
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// --- RESTO DO CÓDIGO ---
+// --- DATABASE SYNC ---
 db.sequelize.sync()
     .then(() => {
         console.log("Database synced successfully.");
@@ -70,17 +64,15 @@ db.sequelize.sync()
         console.error("Error syncing database:", error);
     });
 
-app.use("/users", userRoute);
-app.use("/exercises", exerciseRoute);
-app.use("/workouts", workoutRoute);
-app.use("/assignments", assignmentRoute);
-app.use("/secureExampleRoute", exampleRoute);
+// --- ROTAS CENTRALIZADAS ---
+app.use(routes);
 
 app.get('/', (req, res) => {
-    res.send({message:'API Started'});
+    res.send({ message: 'API Started' });
 });
 
-const PORT = process.env.PORT || 3000;
+// --- SERVIDOR ---
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server is running on port http://localhost:${PORT}/`);
   console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);

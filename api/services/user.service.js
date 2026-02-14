@@ -119,15 +119,51 @@ const updateUser = async (id, data) => {
 };
 
 const getDashboardStats = async (personalId) => {
-    // Conta total de alunos ativos
+    const UserWorkout = db.user_workouts;
+    const Measurement = db.measurements;
+
     const totalAlunos = await User.count({
         where: { personal_id: personalId, role: 'ALUNO', status: 'Ativo' }
     });
 
-    // Aqui você pode adicionar contagens de treinos no futuro
+    const students = await User.findAll({
+        where: { personal_id: personalId, role: 'ALUNO', status: 'Ativo' },
+        attributes: ['id'],
+        raw: true
+    });
+    const studentIds = students.map(s => s.id);
+
+    let treinosAtivos = 0;
+    let medidasPendentes = 0;
+
+    if (studentIds.length > 0) {
+        treinosAtivos = await UserWorkout.count({
+            where: {
+                usuario_id: { [Op.in]: studentIds },
+                status_treino: 'Ativo'
+            }
+        });
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const alunosComMedida = await Measurement.findAll({
+            where: {
+                usuario_id: { [Op.in]: studentIds },
+                data_medicao: { [Op.gte]: thirtyDaysAgo }
+            },
+            attributes: [[db.Sequelize.fn('DISTINCT', db.Sequelize.col('usuario_id')), 'usuario_id']],
+            raw: true
+        });
+
+        const idsComMedida = alunosComMedida.map(m => m.usuario_id);
+        medidasPendentes = studentIds.filter(id => !idsComMedida.includes(id)).length;
+    }
+
     return {
         total_alunos: totalAlunos,
-        // treinos_ativos: ... (implementar depois com o service de treinos)
+        treinos_ativos: treinosAtivos,
+        medidas_pendentes: medidasPendentes
     };
 };
 

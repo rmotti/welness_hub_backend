@@ -93,4 +93,8 @@ db.workout_exercises.belongsTo(db.workouts, { foreignKey: "treino_id" });
 db.exercises.hasMany(db.workout_exercises, { foreignKey: "exercicio_id" });
 db.workout_exercises.belongsTo(db.exercises, { foreignKey: "exercicio_id" });
 
+// 5. Associações diretas da tabela Pivot UserWorkout (para includes em queries)
+db.user_workouts.belongsTo(db.workouts, { foreignKey: 'treino_id', as: 'treino' });
+db.user_workouts.belongsTo(db.users, { foreignKey: 'usuario_id', as: 'aluno' });
+
 export default db;
