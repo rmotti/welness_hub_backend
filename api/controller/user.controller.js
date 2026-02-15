@@ -4,14 +4,15 @@ import userService from '../services/user.service.js';
 
 const register = async (req, res) => {
     // Ajuste: O banco usa 'nome', não 'username'
-    const { nome, email, password, role } = req.body;
+    const { nome,name, email, password, role } = req.body;
+    const userName = nome || name;
 
-    if (!nome || !email || !password) {
+    if (!userName || !email || !password) {
         return res.status(400).json({ message: 'Nome, email e senha são obrigatórios.' });
     }
 
     try {
-        const user = await userService.registerUser({ nome, email, password, role });
+        const user = await userService.registerUser({ nome: userName, email, password, role });
         return res.status(201).json({ message: 'Usuário registrado com sucesso!', user });
     } catch (error) {
         console.error("Error registering user:", error);
@@ -103,7 +104,7 @@ const updateMe = async (req, res) => {
         // Isso impede que um aluno vire ADMIN enviando { role: 'ADMIN' }.
         const dataToUpdate = {};
         
-        if (nome) dataToUpdate.nome = nome;
+        if (userName) dataToUpdate.nome = userName;
         if (email) dataToUpdate.email = email;
         if (password) dataToUpdate.password = password; // O Service vai fazer o hash
         if (telefone) dataToUpdate.telefone = telefone;
