@@ -2,24 +2,30 @@ import db from '../models/index.js';
 
 const Workout = db.workouts;
 const Exercise = db.exercises;
-const WorkoutExercise = db.workout_exercises; // Certifique-se que este é o nome no db object
+const WorkoutExercise = db.workout_exercises; 
 const Op = db.Sequelize.Op;
 
 // --- Services de Treino (Cabeçalho) ---
 
-const createWorkout = async ({ nome, descricao, personal_id }) => {
+const createWorkout = async ({ nome_treino, objetivo_treino, descricao, personal_id }) => {
+    // CORREÇÃO: Usando os nomes exatos das colunas do banco
     return await Workout.create({
-        nome,
+        nome_treino,
+        objetivo_treino,
         descricao,
         personal_id
     });
 };
 
 const getAllWorkouts = async (personalId, filters) => {
-    const { nome } = filters;
+    // CORREÇÃO: O filtro deve buscar pelo campo 'nome_treino'
+    const { nome_treino } = filters;
     let condition = { personal_id: personalId };
 
-    if (nome) condition.nome = { [Op.iLike]: `%${nome}%` };
+    // Se o filtro vier preenchido, fazemos o ILIKE no campo correto
+    if (nome_treino) {
+        condition.nome_treino = { [Op.iLike]: `%${nome_treino}%` };
+    }
 
     return await Workout.findAll({
         where: condition
@@ -30,6 +36,7 @@ const updateWorkout = async (id, data) => {
     const workout = await Workout.findByPk(id);
     if (!workout) throw { status: 404, message: 'Treino não encontrado' };
 
+    // O 'data' já deve vir com chaves corretas (nome_treino, etc) do controller
     await workout.update(data);
     return await Workout.findByPk(id);
 };
@@ -38,23 +45,18 @@ const updateWorkout = async (id, data) => {
 
 // GET /workouts/:workoutId/exercises
 const getWorkoutExercises = async (workoutId) => {
-    // Buscamos diretamente na tabela de junção para ter mais controle sobre a ordem e campos
     const exercises = await WorkoutExercise.findAll({
         where: { treino_id: workoutId },
         include: [
             {
                 model: Exercise,
-                as: 'exercise', // Necessário definir 'belongsTo' no index.js (ver nota abaixo)
-                attributes: ['id', 'nome', 'grupo_muscular', 'video_url'] // Campos que você quer exibir do exercício base
+                as: 'exercise', // IMPORTANTE: Verifique se no seu index.js a associação está como 'exercise' ou 'Exercise'
+                attributes: ['id', 'nome', 'grupo_muscular', 'video_url'] 
             }
         ],
         order: [['ordem', 'ASC']]
     });
     
-    // Se quiser retornar erro 404 caso o treino não tenha exercícios, descomente abaixo. 
-    // Mas retornar array vazio [] costuma ser melhor para o front-end.
-    // if (!exercises) throw { status: 404, message: 'Nenhum exercício encontrado para este treino' };
-
     return exercises;
 };
 
@@ -69,16 +71,14 @@ const addExerciseToWorkout = async (workoutId, data) => {
         observacao_especifica 
     } = data;
 
-    // Verificação opcional: checar se o treino existe
     const workout = await Workout.findByPk(workoutId);
     if (!workout) throw { status: 404, message: 'Treino não encontrado' };
 
-    // Cria o vínculo
     return await WorkoutExercise.create({
-        treino_id: workoutId,      // FK correta baseada no seu model
-        exercicio_id: exercicio_id,// FK correta baseada no seu model
+        treino_id: workoutId,      
+        exercicio_id: exercicio_id,
         series,
-        repeticoes,            // String (ex: "10-12")
+        repeticoes,            
         ordem,
         descanso_segundos,
         observacao_especifica
@@ -86,8 +86,8 @@ const addExerciseToWorkout = async (workoutId, data) => {
 };
 
 // PUT /workouts/:workoutId/exercises/:exerciseId
-// Atualiza os dados da série (reps, descanso) de um exercício específico naquele treino
 const updateWorkoutExercise = async (workoutId, exerciseId, data) => {
+    // Busca o item específico na tabela de ligação
     const item = await WorkoutExercise.findOne({
         where: {
             treino_id: workoutId,
@@ -97,7 +97,7 @@ const updateWorkoutExercise = async (workoutId, exerciseId, data) => {
 
     if (!item) throw { status: 404, message: 'Exercício não encontrado neste treino' };
 
-    // Atualizamos apenas os campos permitidos na tabela de junção
+    // Atualiza com os dados recebidos
     await item.update({
         series: data.series,
         repeticoes: data.repeticoes,

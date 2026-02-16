@@ -4,15 +4,18 @@ import workoutService from '../services/workout.service.js';
 
 const create = async (req, res) => {
     try {
-        const { nome, descricao } = req.body;
+        // CORREÇÃO: Desestruturando com os nomes exatos que vêm do Frontend
+        const { nome_treino, objetivo_treino, descricao } = req.body;
         const personal_id = req.userId; // Vem do middleware de auth
 
-        if (!nome) {
+        // CORREÇÃO: Validando a variável correta
+        if (!nome_treino) {
             return res.status(400).send({ message: "O nome do treino é obrigatório." });
         }
 
         const workout = await workoutService.createWorkout({
-            nome,
+            nome_treino,
+            objetivo_treino,
             descricao,
             personal_id
         });
@@ -28,6 +31,7 @@ const getAll = async (req, res) => {
         const personal_id = req.userId; // Garante que só busca treinos deste personal
         const filters = req.query; // Pega filtros da URL (ex: ?nome=Hipertrofia)
 
+        // IMPORTANTE: Seu Service precisa estar preparado para receber esse personal_id
         const workouts = await workoutService.getAllWorkouts(personal_id, filters);
         
         res.status(200).send(workouts);
@@ -41,7 +45,6 @@ const update = async (req, res) => {
         const id = req.params.id;
         
         // Opcional: Validar se o treino pertence ao personal antes de editar
-        // (Isso geralmente é feito no service ou aqui verificando o dono)
         
         const updatedWorkout = await workoutService.updateWorkout(id, req.body);
         res.status(200).send(updatedWorkout);
