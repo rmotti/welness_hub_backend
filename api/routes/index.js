@@ -9,7 +9,6 @@ import measurementController from '../controller/measurement.controller.js';
 const router = express.Router();
 
 
-
 router.post('/auth/register', userController.register);
 router.post('/auth/login', userController.login);
 router.get('/auth/me', verifyToken, userController.getMe);
@@ -27,7 +26,6 @@ router.get('/dashboard/stats', verifyToken, userController.getDashboard);
 
 router.get('/students', verifyToken, userController.getAllStudents);
 router.get('/students/:id', verifyToken, userController.getStudentById);
-router.post('/students', verifyToken, userController.createStudent);
 router.post('/students', verifyToken, userController.createStudent);
 router.put('/students/:id', verifyToken, userController.updateUser);
 router.delete('/students/:id', verifyToken, userController.deleteUser);

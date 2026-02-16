@@ -79,11 +79,10 @@ const getAllStudents = async (req, res) => {
     }
 };
 
-// --- [NOVO] FUNÇÃO QUE FALTAVA ---
+
 const getStudentById = async (req, res) => {
     const { id } = req.params;
     try {
-        // Reutilizamos o service getUserById que já busca por Primary Key
         const student = await userService.getUserById(id);
         
         if (!student) {
@@ -158,7 +157,7 @@ export default {
     getMe,
     createStudent,
     getAllStudents,
-    getStudentById, // <--- Adicionado aqui no export
+    getStudentById, 
     updateUser,
     updateMe,
     deleteUser,

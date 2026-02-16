@@ -105,7 +105,6 @@ const deleteUser = async (id) => {
 // --- GENÉRICO & DASHBOARD ---
 
 const getUserById = async (id) => {
-    // Esta função é chamada pelo Controller no GET /students/:id
     const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
     
     if (!user) throw { status: 404, message: 'Usuário não encontrado' };
