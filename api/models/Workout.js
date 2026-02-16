@@ -14,12 +14,29 @@ export default (sequelize, Sequelize) => {
     },
     descricao: {
       type: Sequelize.TEXT
+    },
+    // Novo campo para o ID do criador
+    user_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'usuarios', // Nome da tabela de usuários
+        key: 'id'
+      }
     }
   }, {
     tableName: 'treino',
-    timestamps: false, // Sem created_at/updated_at no SQL
+    timestamps: false,
     underscored: true
   });
+
+  // Configuração da associação
+  Workout.associate = (models) => {
+    Workout.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'criador'
+    });
+  };
 
   return Workout;
 };
