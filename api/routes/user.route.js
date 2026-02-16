@@ -18,7 +18,8 @@ router.put('/me', verifyToken, userController.updateMe);
 router.get('/dashboard/stats', verifyToken, userController.getDashboard);
 
 // 3. Gestão de Alunos (O Personal gerencia seus alunos)
-router.get('/students', verifyToken, userController.getAllStudents);      // Lista
+router.get('/students', verifyToken, userController.getAllStudents);      // Lista todos
+router.get('/students/:id', verifyToken, userController.getStudentById);  // <--- ADICIONE ESTA LINHA (Busca detalhes do aluno)
 router.post('/students', verifyToken, userController.createStudent);      // Cria
 router.put('/students/:id', verifyToken, userController.updateUser);      // Edita
 router.delete('/students/:id', verifyToken, userController.deleteUser);   // Remove (Inativa)
