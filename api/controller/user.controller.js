@@ -4,7 +4,7 @@ import userService from '../services/user.service.js';
 
 const register = async (req, res) => {
     // Ajuste: O banco usa 'nome', não 'username'
-    const { nome,name, email, password, role } = req.body;
+    const { nome, name, email, password, role } = req.body;
     const userName = nome || name;
 
     if (!userName || !email || !password) {
@@ -45,7 +45,7 @@ const login = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-        // req.userId vem do Middleware de JWT (que você já tem)
+        // req.userId vem do Middleware de JWT
         const user = await userService.getUserById(req.userId);
         return res.status(200).json(user);
     } catch (error) {
@@ -58,7 +58,6 @@ const getMe = async (req, res) => {
 const createStudent = async (req, res) => {
     try {
         // O Personal (req.userId) está criando um Aluno
-        // O Service já vai forçar role='ALUNO' e vincular o ID
         const newStudent = await userService.createAluno(req.body, req.userId);
         return res.status(201).json({ message: 'Aluno cadastrado com sucesso!', student: newStudent });
     } catch (error) {
@@ -68,15 +67,30 @@ const createStudent = async (req, res) => {
 
 const getAllStudents = async (req, res) => {
     try {
-        // Filtros vindos da URL (ex: ?nome=joao&status=Ativo)
         const filters = {
             nome: req.query.nome,
             status: req.query.status
         };
         
-        // Passamos o ID do personal para ele só ver OS SEUS alunos
         const students = await userService.getAllAlunos(req.userId, filters);
         return res.status(200).json(students);
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message });
+    }
+};
+
+// --- [NOVO] FUNÇÃO QUE FALTAVA ---
+const getStudentById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Reutilizamos o service getUserById que já busca por Primary Key
+        const student = await userService.getUserById(id);
+        
+        if (!student) {
+            return res.status(404).json({ message: 'Aluno não encontrado.' });
+        }
+
+        return res.status(200).json(student);
     } catch (error) {
         return res.status(error.status || 500).json({ message: error.message });
     }
@@ -85,8 +99,6 @@ const getAllStudents = async (req, res) => {
 const updateUser = async (req, res) => {
     const { id } = req.params;
     try {
-        // Aqui você pode adicionar uma validação extra se quiser impedir 
-        // que um personal edite aluno de outro, mas o service ajuda nisso.
         const updatedUser = await userService.updateUser(id, req.body);
         return res.status(200).json({ message: 'Dados atualizados.', user: updatedUser });
     } catch (error) {
@@ -99,18 +111,15 @@ const updateMe = async (req, res) => {
         const userId = req.userId; // Vem do verifyToken
         const { nome, email, password, telefone, objetivo } = req.body;
 
-        // FILTRO DE SEGURANÇA:
-        // Montamos um objeto apenas com o que é PERMITIDO alterar no próprio perfil.
-        // Isso impede que um aluno vire ADMIN enviando { role: 'ADMIN' }.
         const dataToUpdate = {};
         
-        if (userName) dataToUpdate.nome = userName;
+        // CORREÇÃO: Aqui estava 'userName', mudei para 'nome' que vem do body
+        if (nome) dataToUpdate.nome = nome;
         if (email) dataToUpdate.email = email;
-        if (password) dataToUpdate.password = password; // O Service vai fazer o hash
+        if (password) dataToUpdate.password = password; 
         if (telefone) dataToUpdate.telefone = telefone;
         if (objetivo) dataToUpdate.objetivo = objetivo;
 
-        // Chama o service reutilizando a função de update existente
         const updatedUser = await userService.updateUser(userId, dataToUpdate);
 
         return res.status(200).json({ 
@@ -149,6 +158,7 @@ export default {
     getMe,
     createStudent,
     getAllStudents,
+    getStudentById, // <--- Adicionado aqui no export
     updateUser,
     updateMe,
     deleteUser,
