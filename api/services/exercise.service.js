@@ -24,6 +24,12 @@ const getAllExercises = async (filters) => {
     });
 };
 
+const getExerciseById = async (id) => {
+    const exercise = await Exercise.findByPk(id);
+    if (!exercise) throw { status: 404, message: 'Exercício não encontrado' };
+    return exercise;
+};
+
 const updateExercise = async (id, data) => {
     const exercise = await Exercise.findByPk(id);
     if (!exercise) throw { status: 404, message: 'Exercício não encontrado' };
@@ -41,6 +47,7 @@ const deleteExercise = async (id) => {
 export default {
     createExercise,
     getAllExercises,
+    getExerciseById,
     updateExercise,
     deleteExercise
 };

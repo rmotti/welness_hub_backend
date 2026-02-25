@@ -78,6 +78,25 @@ router.post('/exercises', verifyToken, exerciseController.createExercise);
 /**
  * @swagger
  * /exercises/{id}:
+ *   get:
+ *     summary: Retorna um exercício pelo ID
+ *     tags: [Exercises]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do exercício
+ *     responses:
+ *       200:
+ *         description: Dados do exercício
+ *       404:
+ *         description: Exercício não encontrado
+ *       401:
+ *         description: Não autorizado
  *   put:
  *     summary: Atualiza um exercício do catálogo
  *     tags: [Exercises]
@@ -129,6 +148,7 @@ router.post('/exercises', verifyToken, exerciseController.createExercise);
  *       401:
  *         description: Não autorizado
  */
+router.get('/exercises/:id', verifyToken, exerciseController.getExerciseById);
 router.put('/exercises/:id', verifyToken, exerciseController.updateExercise);
 router.delete('/exercises/:id', verifyToken, exerciseController.deleteExercise);
 
