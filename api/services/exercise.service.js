@@ -32,9 +32,16 @@ const updateExercise = async (id, data) => {
     return await Exercise.findByPk(id);
 };
 
+const deleteExercise = async (id) => {
+    const exercise = await Exercise.findByPk(id);
+    if (!exercise) throw { status: 404, message: 'Exercício não encontrado' };
+    await exercise.destroy();
+};
+
 export default {
     createExercise,
     getAllExercises,
-    updateExercise
+    updateExercise,
+    deleteExercise
 };
 

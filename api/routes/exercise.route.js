@@ -109,7 +109,27 @@ router.post('/exercises', verifyToken, exerciseController.createExercise);
  *         description: Não autorizado
  *       404:
  *         description: Exercício não encontrado
+ *   delete:
+ *     summary: Remove um exercício do catálogo
+ *     tags: [Exercises]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do exercício
+ *     responses:
+ *       204:
+ *         description: Exercício removido com sucesso
+ *       404:
+ *         description: Exercício não encontrado
+ *       401:
+ *         description: Não autorizado
  */
 router.put('/exercises/:id', verifyToken, exerciseController.updateExercise);
+router.delete('/exercises/:id', verifyToken, exerciseController.deleteExercise);
 
 export default router;

@@ -34,8 +34,19 @@ const updateExercise = async (req, res) => {
     }
 };
 
+const deleteExercise = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await exerciseService.deleteExercise(id);
+        return res.status(204).send();
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message || 'Erro Interno do Servidor' });
+    }
+};
+
 export default {
     createExercise,
     getExercises,
-    updateExercise
+    updateExercise,
+    deleteExercise
 };
