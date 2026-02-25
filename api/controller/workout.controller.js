@@ -57,6 +57,24 @@ const update = async (req, res) => {
     }
 };
 
+const getById = async (req, res) => {
+    try {
+        const workout = await workoutService.getWorkoutById(req.params.id);
+        res.status(200).send(workout);
+    } catch (error) {
+        res.status(error.status || 500).send({ message: error.message || "Erro ao buscar treino." });
+    }
+};
+
+const remove = async (req, res) => {
+    try {
+        await workoutService.deleteWorkout(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(error.status || 500).send({ message: error.message || "Erro ao excluir treino." });
+    }
+};
+
 // --- Controllers de Itens do Treino (Exercícios) ---
 
 const getExercises = async (req, res) => {
@@ -148,6 +166,8 @@ const removeExercise = async (req, res) => {
 export default {
     create,
     getAll,
+    getById,
+    remove,
     update,
     getExercises,
     addExercise,

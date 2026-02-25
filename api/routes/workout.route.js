@@ -80,6 +80,25 @@ router.post('/workouts', verifyToken, workoutController.create);
 /**
  * @swagger
  * /workouts/{id}:
+ *   get:
+ *     summary: Retorna um treino pelo ID
+ *     tags: [Workouts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do treino
+ *     responses:
+ *       200:
+ *         description: Dados do treino
+ *       404:
+ *         description: Treino não encontrado
+ *       401:
+ *         description: Não autorizado
  *   put:
  *     summary: Atualiza um treino existente
  *     tags: [Workouts]
@@ -111,8 +130,29 @@ router.post('/workouts', verifyToken, workoutController.create);
  *         description: Não autorizado
  *       404:
  *         description: Treino não encontrado
+ *   delete:
+ *     summary: Exclui um treino pelo ID
+ *     tags: [Workouts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do treino
+ *     responses:
+ *       204:
+ *         description: Treino excluído com sucesso
+ *       404:
+ *         description: Treino não encontrado
+ *       401:
+ *         description: Não autorizado
  */
+router.get('/workouts/:id', verifyToken, workoutController.getById);
 router.put('/workouts/:id', verifyToken, workoutController.update);
+router.delete('/workouts/:id', verifyToken, workoutController.remove);
 
 // =============================================================================
 // WORKOUT EXERCISES

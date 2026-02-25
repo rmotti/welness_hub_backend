@@ -12,9 +12,6 @@ export default (sequelize, Sequelize) => {
     grupo_muscular: {
       type: Sequelize.STRING
     },
-    link_video: {
-      type: Sequelize.STRING
-    },
     descricao: {
       type: Sequelize.TEXT
     }

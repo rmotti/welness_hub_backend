@@ -34,6 +34,9 @@ export default (sequelize, Sequelize) => {
     descanso_segundos: {
       type: Sequelize.INTEGER
     },
+    peso: {
+      type: Sequelize.DECIMAL(6, 2)
+    },
     observacao_especifica: {
       type: Sequelize.TEXT
     }
