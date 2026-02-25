@@ -32,6 +32,18 @@ const getAllWorkouts = async (personalId, filters) => {
     });
 };
 
+const getWorkoutById = async (id) => {
+    const workout = await Workout.findByPk(id);
+    if (!workout) throw { status: 404, message: 'Treino não encontrado' };
+    return workout;
+};
+
+const deleteWorkout = async (id) => {
+    const workout = await Workout.findByPk(id);
+    if (!workout) throw { status: 404, message: 'Treino não encontrado' };
+    await workout.destroy();
+};
+
 const updateWorkout = async (id, data) => {
     const workout = await Workout.findByPk(id);
     if (!workout) throw { status: 404, message: 'Treino não encontrado' };
@@ -51,7 +63,7 @@ const getWorkoutExercises = async (workoutId) => {
             {
                 model: Exercise,
                 as: 'exercise', // IMPORTANTE: Verifique se no seu index.js a associação está como 'exercise' ou 'Exercise'
-                attributes: ['id', 'nome', 'grupo_muscular', 'video_url'] 
+                attributes: ['id', 'nome', 'grupo_muscular']
             }
         ],
         order: [['ordem', 'ASC']]
@@ -62,25 +74,27 @@ const getWorkoutExercises = async (workoutId) => {
 
 // POST /workouts/:workoutId/exercises
 const addExerciseToWorkout = async (workoutId, data) => {
-    const { 
-        exercicio_id, 
-        series, 
-        repeticoes, 
-        ordem, 
+    const {
+        exercicio_id,
+        series,
+        repeticoes,
+        ordem,
         descanso_segundos,
-        observacao_especifica 
+        peso,
+        observacao_especifica
     } = data;
 
     const workout = await Workout.findByPk(workoutId);
     if (!workout) throw { status: 404, message: 'Treino não encontrado' };
 
     return await WorkoutExercise.create({
-        treino_id: workoutId,      
+        treino_id: workoutId,
         exercicio_id: exercicio_id,
         series,
-        repeticoes,            
+        repeticoes,
         ordem,
         descanso_segundos,
+        peso,
         observacao_especifica
     });
 };
@@ -103,6 +117,7 @@ const updateWorkoutExercise = async (workoutId, exerciseId, data) => {
         repeticoes: data.repeticoes,
         ordem: data.ordem,
         descanso_segundos: data.descanso_segundos,
+        peso: data.peso,
         observacao_especifica: data.observacao_especifica
     });
 
@@ -126,6 +141,8 @@ const removeExerciseFromWorkout = async (workoutId, exerciseId) => {
 export default {
     createWorkout,
     getAllWorkouts,
+    getWorkoutById,
+    deleteWorkout,
     updateWorkout,
     getWorkoutExercises,
     addExerciseToWorkout,
