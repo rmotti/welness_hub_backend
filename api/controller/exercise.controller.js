@@ -22,6 +22,16 @@ const getExercises = async (req, res) => {
     }
 };
 
+const getExerciseById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const exercise = await exerciseService.getExerciseById(id);
+        return res.status(200).json(exercise);
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message || 'Erro Interno do Servidor' });
+    }
+};
+
 const updateExercise = async (req, res) => {
     const { id } = req.params;
     const data = req.body;
@@ -47,6 +57,7 @@ const deleteExercise = async (req, res) => {
 export default {
     createExercise,
     getExercises,
+    getExerciseById,
     updateExercise,
     deleteExercise
 };
