@@ -1,6 +1,7 @@
 import express from 'express';
 import workoutController from '../controller/workout.controller.js';
 import verifyToken from '../middleware/jwt.token.middleware.js';
+import authorize from '../middleware/authorize.middleware.js';
 
 const router = express.Router();
 
@@ -74,8 +75,10 @@ router.get('/workouts', verifyToken, workoutController.getAll);
  *         description: Nome do treino é obrigatório
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  */
-router.post('/workouts', verifyToken, workoutController.create);
+router.post('/workouts', verifyToken, authorize('trainer', 'admin'), workoutController.create);
 
 /**
  * @swagger
@@ -128,6 +131,8 @@ router.post('/workouts', verifyToken, workoutController.create);
  *         description: Treino atualizado com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  *       404:
  *         description: Treino não encontrado
  *   delete:
@@ -145,14 +150,16 @@ router.post('/workouts', verifyToken, workoutController.create);
  *     responses:
  *       204:
  *         description: Treino excluído com sucesso
- *       404:
- *         description: Treino não encontrado
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
+ *       404:
+ *         description: Treino não encontrado
  */
 router.get('/workouts/:id', verifyToken, workoutController.getById);
-router.put('/workouts/:id', verifyToken, workoutController.update);
-router.delete('/workouts/:id', verifyToken, workoutController.remove);
+router.put('/workouts/:id', verifyToken, authorize('trainer', 'admin'), workoutController.update);
+router.delete('/workouts/:id', verifyToken, authorize('trainer', 'admin'), workoutController.remove);
 
 // =============================================================================
 // WORKOUT EXERCISES
@@ -231,8 +238,10 @@ router.get('/workouts/:workoutId/exercises', verifyToken, workoutController.getE
  *         description: ID do exercício é obrigatório
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  */
-router.post('/workouts/:workoutId/exercises', verifyToken, workoutController.addExercise);
+router.post('/workouts/:workoutId/exercises', verifyToken, authorize('trainer', 'admin'), workoutController.addExercise);
 
 /**
  * @swagger
@@ -276,6 +285,8 @@ router.post('/workouts/:workoutId/exercises', verifyToken, workoutController.add
  *         description: Item atualizado com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  *       404:
  *         description: Item não encontrado
  *   delete:
@@ -301,10 +312,12 @@ router.post('/workouts/:workoutId/exercises', verifyToken, workoutController.add
  *         description: Exercício removido do treino com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  *       404:
  *         description: Item não encontrado
  */
-router.put('/workouts/:workoutId/exercises/:exerciseId', verifyToken, workoutController.updateExerciseItem);
-router.delete('/workouts/:workoutId/exercises/:exerciseId', verifyToken, workoutController.removeExercise);
+router.put('/workouts/:workoutId/exercises/:exerciseId', verifyToken, authorize('trainer', 'admin'), workoutController.updateExerciseItem);
+router.delete('/workouts/:workoutId/exercises/:exerciseId', verifyToken, authorize('trainer', 'admin'), workoutController.removeExercise);
 
 export default router;

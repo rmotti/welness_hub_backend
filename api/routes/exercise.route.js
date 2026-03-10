@@ -1,6 +1,7 @@
 import express from 'express';
 import exerciseController from '../controller/exercise.controller.js';
 import verifyToken from '../middleware/jwt.token.middleware.js';
+import authorize from '../middleware/authorize.middleware.js';
 
 const router = express.Router();
 
@@ -72,8 +73,10 @@ router.get('/exercises', verifyToken, exerciseController.getExercises);
  *         description: Exercício criado com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  */
-router.post('/exercises', verifyToken, exerciseController.createExercise);
+router.post('/exercises', verifyToken, authorize('trainer', 'admin'), exerciseController.createExercise);
 
 /**
  * @swagger
@@ -126,6 +129,8 @@ router.post('/exercises', verifyToken, exerciseController.createExercise);
  *         description: Exercício atualizado com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
  *       404:
  *         description: Exercício não encontrado
  *   delete:
@@ -143,13 +148,15 @@ router.post('/exercises', verifyToken, exerciseController.createExercise);
  *     responses:
  *       204:
  *         description: Exercício removido com sucesso
- *       404:
- *         description: Exercício não encontrado
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer ou admin)
+ *       404:
+ *         description: Exercício não encontrado
  */
 router.get('/exercises/:id', verifyToken, exerciseController.getExerciseById);
-router.put('/exercises/:id', verifyToken, exerciseController.updateExercise);
-router.delete('/exercises/:id', verifyToken, exerciseController.deleteExercise);
+router.put('/exercises/:id', verifyToken, authorize('trainer', 'admin'), exerciseController.updateExercise);
+router.delete('/exercises/:id', verifyToken, authorize('trainer', 'admin'), exerciseController.deleteExercise);
 
 export default router;

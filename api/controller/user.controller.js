@@ -140,6 +140,34 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const resetStudentPassword = async (req, res) => {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+        return res.status(400).json({ message: 'O campo newPassword é obrigatório.' });
+    }
+
+    try {
+        const result = await userService.resetStudentPassword(id, newPassword);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message });
+    }
+};
+
+// --- GESTÃO GERAL DE USUÁRIOS (Admin) ---
+
+const getAllUsers = async (req, res) => {
+    try {
+        const filters = { role: req.query.role };
+        const users = await userService.getAllUsers(filters);
+        return res.status(200).json(users);
+    } catch (error) {
+        return res.status(error.status || 500).json({ message: error.message });
+    }
+};
+
 // --- DASHBOARD ---
 
 const getDashboard = async (req, res) => {
@@ -155,11 +183,13 @@ export default {
     register,
     login,
     getMe,
+    getAllUsers,
     createStudent,
     getAllStudents,
-    getStudentById, 
+    getStudentById,
     updateUser,
     updateMe,
     deleteUser,
-    getDashboard
+    getDashboard,
+    resetStudentPassword
 };

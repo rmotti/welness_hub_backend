@@ -19,9 +19,10 @@ const verifyToken = (req, res, next) => {
             return res.status(401).send({ message: 'Não autorizado! Token inválido ou expirado.' });
         }
 
-        // 4. Injeta ID e ROLE na requisição
+        // 4. Injeta ID, ROLE e STUDENT_ID na requisição
         req.userId = decoded.id;
-        req.userRole = decoded.role; // <--- ADICIONADO: Importante para proteger rotas depois
+        req.userRole = decoded.role;
+        req.userStudentId = decoded.studentId || null; // Presente apenas para role 'student'
 
         next();
     });

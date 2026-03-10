@@ -49,6 +49,8 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
+console.log('[Swagger] Paths registrados:', Object.keys(swaggerDocs.paths || {}).sort());
+app.get('/swagger-spec', (req, res) => res.json(swaggerDocs));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // --- DATABASE SYNC ---
