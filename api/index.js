@@ -29,6 +29,10 @@ const swaggerOptions = {
         url: 'http://localhost:3001',
         description: 'Servidor Local',
       },
+      {
+        url: 'https://welness-hub-backend.vercel.app', 
+        description: 'Servidor de Produção',
+      },
     ],
     components: {
       securitySchemes: {
@@ -49,9 +53,20 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-console.log('[Swagger] Paths registrados:', Object.keys(swaggerDocs.paths || {}).sort());
 app.get('/swagger-spec', (req, res) => res.json(swaggerDocs));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// --- CORREÇÃO DO SWAGGER NA VERCEL (CDNs) ---
+const customSwaggerOptions = {
+  customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+  customJs: [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js'
+  ]
+};
+
+// Aplicando as opções customizadas no setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, customSwaggerOptions));
+
 
 // --- DATABASE SYNC ---
 db.sequelize.sync()
