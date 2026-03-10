@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'; 
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../models/index.js';
 
@@ -18,7 +18,7 @@ const registerUser = async ({ nome, email, password, role }) => {
         nome,
         email,
         password: hashedPassword,
-        role: role || 'ALUNO',
+        role: role || 'trainer',
         status: 'Ativo'
     });
 };
@@ -33,9 +33,9 @@ const loginUser = async ({ email, password }) => {
 
     if (user.status !== 'Ativo') throw { status: 403, message: 'Usuário inativo.' };
 
-    // Gera token com ID e ROLE
+    // Gera token com ID, ROLE e STUDENT_ID (para alunos)
     const token = jwt.sign(
-        { id: user.id, role: user.role },
+        { id: user.id, role: user.role, studentId: user.student_id || null },
         process.env.JWT_SECRET || 'SEGREDO_SUPER_SECRETO',
         { expiresIn: '8h' }
     );
@@ -47,7 +47,8 @@ const loginUser = async ({ email, password }) => {
             nome: user.nome,
             email: user.email,
             role: user.role,
-            personal_id: user.personal_id
+            personal_id: user.personal_id,
+            student_id: user.student_id
         }
     };
 };
@@ -56,16 +57,16 @@ const loginUser = async ({ email, password }) => {
 
 const getAllAlunos = async (personalId, filters) => {
     const { nome, status } = filters;
-    
+
     // Filtro: Apenas alunos vinculados a este Personal (personalId)
-    let condition = { 
-        role: 'ALUNO',
-        personal_id: personalId 
+    // Suporta role 'student' (novo) e 'ALUNO' (legado) para retrocompatibilidade
+    let condition = {
+        role: { [Op.in]: ['student', 'ALUNO'] },
+        personal_id: personalId
     };
 
-    // CORREÇÃO: Adicionadas as crases (template literals) para o iLike funcionar
-    if (nome) condition.nome = { [Op.iLike]: `%${nome}%` }; 
-    
+    if (nome) condition.nome = { [Op.iLike]: `%${nome}%` };
+
     if (status) condition.status = status;
 
     return await User.findAll({
@@ -78,18 +79,64 @@ const createAluno = async (data, personalId) => {
     const existingUser = await User.findOne({ where: { email: data.email } });
     if (existingUser) throw { status: 409, message: 'Email já cadastrado.' };
 
-    // CORREÇÃO: Fallback caso o front não mande senha (define uma padrão)
-    const plainPassword = data.password || 'mudar123';
+    // studentPassword é o campo dedicado para a senha do aluno (Fase 1 — RBAC).
+    // Fallback para 'password' (retrocompat) ou 'mudar123' se nenhum for enviado.
+    const plainPassword = data.studentPassword || data.password || 'mudar123';
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(plainPassword, salt);
 
-    return await User.create({
-        ...data,
-        password: hashedPassword,
-        role: 'ALUNO',
-        personal_id: personalId, // Vincula ao Personal que criou
-        status: 'Ativo'
+    // Usa transaction para garantir atomicidade: se qualquer etapa falhar, desfaz tudo.
+    const transaction = await db.sequelize.transaction();
+    try {
+        const student = await User.create({
+            nome: data.nome,
+            email: data.email,
+            telefone: data.telefone,
+            objetivo: data.objetivo,
+            password: hashedPassword,
+            role: 'student',
+            personal_id: personalId,
+            status: 'Ativo',
+            student_id: null // Será atualizado logo após a criação
+        }, { transaction });
+
+        // Vincula o student_id ao próprio id do registro recém-criado
+        await student.update({ student_id: student.id }, { transaction });
+
+        await transaction.commit();
+
+        // Retorna sem o campo password
+        const { password: _, ...studentData } = student.toJSON();
+        studentData.student_id = student.id;
+        return studentData;
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+};
+
+const resetStudentPassword = async (studentId, newPassword) => {
+    const student = await User.findOne({
+        where: { id: studentId, role: { [Op.in]: ['student', 'ALUNO'] } }
+    });
+    if (!student) throw { status: 404, message: 'Aluno não encontrado.' };
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await student.update({ password: hashedPassword });
+    return { message: 'Senha do aluno redefinida com sucesso.' };
+};
+
+const getAllUsers = async (filters = {}) => {
+    const { role } = filters;
+    const condition = {};
+    if (role) condition.role = role;
+
+    return await User.findAll({
+        where: condition,
+        attributes: { exclude: ['password'] }
     });
 };
 
@@ -106,9 +153,9 @@ const deleteUser = async (id) => {
 
 const getUserById = async (id) => {
     const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
-    
+
     if (!user) throw { status: 404, message: 'Usuário não encontrado' };
-    
+
     return user;
 };
 
@@ -127,15 +174,18 @@ const updateUser = async (id, data) => {
 };
 
 const getDashboardStats = async (personalId) => {
-    const UserWorkout = db.user_workouts; // Verifique se o nome no db.index é este mesmo
-    const Measurement = db.measurements;  // Verifique se o nome no db.index é este mesmo
+    const UserWorkout = db.user_workouts;
+    const Measurement = db.measurements;
+
+    // Suporta role 'student' (novo) e 'ALUNO' (legado) para retrocompatibilidade
+    const roleFilter = { [Op.in]: ['student', 'ALUNO'] };
 
     const totalAlunos = await User.count({
-        where: { personal_id: personalId, role: 'ALUNO', status: 'Ativo' }
+        where: { personal_id: personalId, role: roleFilter, status: 'Ativo' }
     });
 
     const students = await User.findAll({
-        where: { personal_id: personalId, role: 'ALUNO', status: 'Ativo' },
+        where: { personal_id: personalId, role: roleFilter, status: 'Ativo' },
         attributes: ['id'],
         raw: true
     });
@@ -145,7 +195,6 @@ const getDashboardStats = async (personalId) => {
     let medidasPendentes = 0;
 
     if (studentIds.length > 0) {
-        // Contagem de treinos ativos dos alunos desse personal
         treinosAtivos = await UserWorkout.count({
             where: {
                 usuario_id: { [Op.in]: studentIds },
@@ -156,7 +205,6 @@ const getDashboardStats = async (personalId) => {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        // Lógica para verificar quem não tem medição nos últimos 30 dias
         const alunosComMedida = await Measurement.findAll({
             where: {
                 usuario_id: { [Op.in]: studentIds },
@@ -180,8 +228,10 @@ const getDashboardStats = async (personalId) => {
 export default {
     registerUser,
     loginUser,
+    getAllUsers,
     getAllAlunos,
     createAluno,
+    resetStudentPassword,
     deleteUser,
     getUserById,
     updateUser,

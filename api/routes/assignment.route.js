@@ -1,6 +1,8 @@
 import express from 'express';
 import assignmentController from '../controller/assignment.controller.js';
 import verifyToken from '../middleware/jwt.token.middleware.js';
+import authorize from '../middleware/authorize.middleware.js';
+import ownsStudent from '../middleware/owns-student.middleware.js';
 
 const router = express.Router();
 
@@ -52,8 +54,10 @@ const router = express.Router();
  *                     type: string
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Acesso negado (aluno tentando ver dados de outro aluno)
  */
-router.get('/students/:id/workouts', verifyToken, assignmentController.getStudentWorkouts);
+router.get('/students/:id/workouts', verifyToken, ownsStudent, assignmentController.getStudentWorkouts);
 
 /**
  * @swagger
@@ -92,8 +96,10 @@ router.get('/students/:id/workouts', verifyToken, assignmentController.getStuden
  *         description: aluno_id e treino_id são obrigatórios
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer)
  */
-router.post('/assignments', verifyToken, assignmentController.assignWorkout);
+router.post('/assignments', verifyToken, authorize('trainer'), assignmentController.assignWorkout);
 
 /**
  * @swagger
@@ -115,9 +121,11 @@ router.post('/assignments', verifyToken, assignmentController.assignWorkout);
  *         description: Ficha finalizada com sucesso
  *       401:
  *         description: Não autorizado
+ *       403:
+ *         description: Permissão insuficiente (somente trainer)
  *       404:
  *         description: Ficha não encontrada
  */
-router.patch('/assignments/:id/finish', verifyToken, assignmentController.finishAssignment);
+router.patch('/assignments/:id/finish', verifyToken, authorize('trainer'), assignmentController.finishAssignment);
 
 export default router;
